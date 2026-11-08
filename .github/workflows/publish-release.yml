@@ -59,8 +59,8 @@ jobs:
         run: |
           xcodegen generate
           xcodebuild build \
-            -project TimeTracker.xcodeproj \
-            -scheme TimeTracker \
+            -project Xelapse.xcodeproj \
+            -scheme Xelapse \
             -configuration Release \
             -destination 'generic/platform=macOS' \
             -derivedDataPath release-build \
@@ -72,8 +72,8 @@ jobs:
 
       - name: Verify and package app
         run: |
-          app_path="release-build/Build/Products/Release/TimeTracker.app"
-          executable_path="${app_path}/Contents/MacOS/TimeTracker"
+          app_path="release-build/Build/Products/Release/Xelapse.app"
+          executable_path="${app_path}/Contents/MacOS/Xelapse"
           expected_version="${TAG_NAME#v}"
           actual_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${app_path}/Contents/Info.plist")"
 
@@ -86,7 +86,7 @@ jobs:
           lipo "$executable_path" -verify_arch arm64 x86_64
 
           mkdir -p release-assets
-          archive_name="TimeTracker-${TAG_NAME}.zip"
+          archive_name="Xelapse-${TAG_NAME}.zip"
           ditto -c -k --sequesterRsrc --keepParent "$app_path" "release-assets/${archive_name}"
           (
             cd release-assets
@@ -98,6 +98,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "$TAG_NAME" \
-            "release-assets/TimeTracker-${TAG_NAME}.zip" \
-            "release-assets/TimeTracker-${TAG_NAME}.zip.sha256" \
+            "release-assets/Xelapse-${TAG_NAME}.zip" \
+            "release-assets/Xelapse-${TAG_NAME}.zip.sha256" \
             --clobber

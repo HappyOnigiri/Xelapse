@@ -1,13 +1,13 @@
-PROJECT := TimeTracker.xcodeproj
-SCHEME := TimeTracker
-SAMPLE_SCHEME := TimeTrackerSample
+PROJECT := Xelapse.xcodeproj
+SCHEME := Xelapse
+SAMPLE_SCHEME := XelapseSample
 SCREENSHOT_SCHEME := ReadmeScreenshotGenerator
 DESTINATION := platform=macOS
 # Developer ID が無い環境でもビルド/テストできるよう ad-hoc 署名で統一する。
 SIGN_FLAGS := CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual
 
 APP := $(SCHEME).app
-SAMPLE_APP := TimeTracker Sample.app
+SAMPLE_APP := Xelapse Sample.app
 BUILD_DIR := build
 SAMPLE_BUILD_DIR := build-sample
 SCREENSHOT_BUILD_DIR := build-screenshots

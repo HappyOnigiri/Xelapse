@@ -1,5 +1,5 @@
 # xcodegen で生成するため、プロジェクトファイルはコミットしない
-TimeTracker.xcodeproj/
+Xelapse.xcodeproj/
 
 # Xcode / ビルド成果物
 build/

@@ -13,7 +13,7 @@
     "CSV 出力" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Export CSV"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"导出 CSV"}}}},
     "Mac 起動時に自動的に開く" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Open at Login"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"登录时打开"}}}},
     "OK" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"OK"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"好"}}}},
-    "TimeTracker を終了" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Quit TimeTracker"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"退出 TimeTracker"}}}},
+    "Xelapse を終了" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Quit Xelapse"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"退出 Xelapse"}}}},
     "「%@」を「%@」に変更します。%@ 件の記録が対象です。この操作は取り消せません。" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Change “%1$@” to “%2$@” in %3$@ records? This action cannot be undone."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"要将“%1$@”更改为“%2$@”吗？这会影响 %3$@ 条记录，且无法撤销。"}}}},
     "「%@」を削除してもよろしいですか？この操作は取り消せません。" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"Delete “%@”? This action cannot be undone."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"要删除“%@”吗？此操作无法撤销。"}}}},
     "〜" : {"localizations":{"en":{"stringUnit":{"state":"translated","value":"–"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"–"}}}},

@@ -124,7 +124,7 @@ enum BackupService {
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
-        return "timetracker-backup-\(formatter.string(from: date)).json"
+        return "xelapse-backup-\(formatter.string(from: date)).json"
     }
 
     private static func message(for error: Error, locale: Locale) -> String {

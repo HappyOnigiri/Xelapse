@@ -84,7 +84,7 @@ struct MenuBarContentView: View {
                 open(.settings)
             }
             Divider()
-            MenuButton("TimeTracker を終了", systemImage: "power") {
+            MenuButton("Xelapse を終了", systemImage: "power") {
                 NSApplication.shared.terminate(nil)
             }
         }

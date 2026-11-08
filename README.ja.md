@@ -1,4 +1,4 @@
-# TimeTracker
+# Xelapse
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -28,7 +28,7 @@ macOS のメニューバーから、プロジェクトごとの作業時間を�
 
 ## インストール
 
-[最新のリリース](https://github.com/HappyOnigiri/TimeTracker/releases/latest)から `TimeTracker-vX.Y.Z.zip` をダウンロードして展開し、`TimeTracker.app` を `/Applications` に移動してください。
+[最新のリリース](https://github.com/HappyOnigiri/Xelapse/releases/latest)から `Xelapse-vX.Y.Z.zip` をダウンロードして展開し、`Xelapse.app` を `/Applications` に移動してください。
 
 このアプリは ad-hoc 署名を使用しており、Apple の公証を受けていません。初回起動時は開発元を確認できないため、macOS によって起動を止められる場合があります。一度アプリを開こうとしたあと、**システム設定 > プライバシーとセキュリティ**を開き、「セキュリティ」までスクロールして**このまま開く**をクリックしてください。詳しくは [Apple の「未確認の開発元からの Mac アプリを開く」](https://support.apple.com/ja-jp/guide/mac-help/mh40616/mac)を参照してください。
 
@@ -43,16 +43,16 @@ brew install xcodegen
 リポジトリを取得し、アプリをビルドして `/Applications` に配置します。
 
 ```sh
-git clone https://github.com/HappyOnigiri/TimeTracker.git
-cd TimeTracker
+git clone https://github.com/HappyOnigiri/Xelapse.git
+cd Xelapse
 make install
 ```
 
-`make install` は既存の `/Applications/TimeTracker.app` を置き換えます。
+`make install` は既存の `/Applications/Xelapse.app` を置き換えます。
 
 ## コントリビュート
 
-不具合や機能提案は [Issues](https://github.com/HappyOnigiri/TimeTracker/issues) へ、変更は Pull Request で送ってください。
+不具合や機能提案は [Issues](https://github.com/HappyOnigiri/Xelapse/issues) へ、変更は Pull Request で送ってください。
 
 Pull Request を作成する前に SwiftLint をインストールし、`make ci` が通ることを確認してください。
 
