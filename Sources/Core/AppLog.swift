@@ -7,7 +7,7 @@ import OSLog
 /// 必ずここを通してログに残す。
 enum AppLog {
     static let persistence = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "TimeTracker",
+        subsystem: Bundle.main.bundleIdentifier ?? "Xelapse",
         category: "persistence"
     )
 }

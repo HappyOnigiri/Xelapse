@@ -3,7 +3,7 @@ import SwiftUI
 
 /// メニューバー常駐のタイムトラッキングアプリのエントリポイント。
 @main
-struct TimeTrackerApp: App {
+struct XelapseApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self)
     private var appDelegate
     @AppStorage(AppSettingsKey.displayLanguage)
@@ -69,7 +69,7 @@ struct TimeTrackerApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Window("TimeTracker", id: WindowID.main) {
+        Window("Xelapse", id: WindowID.main) {
             MainWindowView()
                 .environment(engine)
                 // 設定画面のバックアップ復元がアクティブ時間の記録を止めるため、ここでも注入する。

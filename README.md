@@ -1,8 +1,8 @@
-# TimeTracker
+# Xelapse
 
 [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
-TimeTracker is a macOS menu bar app for tracking time by project.
+Xelapse is a macOS menu bar app for tracking time by project.
 
 ## Screenshots
 
@@ -28,7 +28,7 @@ Your records stay on your Mac and are never sent elsewhere. Idle detection does 
 
 ## Installation
 
-Download `TimeTracker-vX.Y.Z.zip` from the [latest release](https://github.com/HappyOnigiri/TimeTracker/releases/latest), extract it, and move `TimeTracker.app` to `/Applications`.
+Download `Xelapse-vX.Y.Z.zip` from the [latest release](https://github.com/HappyOnigiri/Xelapse/releases/latest), extract it, and move `Xelapse.app` to `/Applications`.
 
 The app uses an ad-hoc signature and is not notarized by Apple. The first time you open it, macOS may block it because the developer cannot be verified. After trying to open the app, go to **System Settings > Privacy & Security**, scroll down to Security, and click **Open Anyway**. See [Apple's instructions for opening an app from an unknown developer](https://support.apple.com/guide/mac-help/mh40616/mac).
 
@@ -43,16 +43,16 @@ brew install xcodegen
 Clone the repository and build the app in `/Applications`:
 
 ```sh
-git clone https://github.com/HappyOnigiri/TimeTracker.git
-cd TimeTracker
+git clone https://github.com/HappyOnigiri/Xelapse.git
+cd Xelapse
 make install
 ```
 
-`make install` replaces an existing `/Applications/TimeTracker.app`.
+`make install` replaces an existing `/Applications/Xelapse.app`.
 
 ## Contributing
 
-Please use [Issues](https://github.com/HappyOnigiri/TimeTracker/issues) for bug reports and feature requests, and submit changes as pull requests.
+Please use [Issues](https://github.com/HappyOnigiri/Xelapse/issues) for bug reports and feature requests, and submit changes as pull requests.
 
 Before opening a pull request, install SwiftLint and verify that `make ci` succeeds:
 

@@ -3,7 +3,7 @@ included:
   - Tests
 
 excluded:
-  - TimeTracker.xcodeproj
+  - Xelapse.xcodeproj
 
 opt_in_rules:
   - empty_count

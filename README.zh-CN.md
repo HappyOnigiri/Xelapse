@@ -1,8 +1,8 @@
-# TimeTracker
+# Xelapse
 
 [English](README.md) | [日本語](README.ja.md)
 
-TimeTracker 是一款在 macOS 菜单栏中按项目记录工作时间的应用。
+Xelapse 是一款在 macOS 菜单栏中按项目记录工作时间的应用。
 
 ## 截图
 
@@ -28,7 +28,7 @@ TimeTracker 是一款在 macOS 菜单栏中按项目记录工作时间的应用�
 
 ## 安装
 
-从[最新版本](https://github.com/HappyOnigiri/TimeTracker/releases/latest)下载 `TimeTracker-vX.Y.Z.zip`，解压后将 `TimeTracker.app` 移到 `/Applications`。
+从[最新版本](https://github.com/HappyOnigiri/Xelapse/releases/latest)下载 `Xelapse-vX.Y.Z.zip`，解压后将 `Xelapse.app` 移到 `/Applications`。
 
 本应用使用 ad-hoc 签名，且未经过 Apple 公证。首次打开时，macOS 可能会因为无法验证开发者而阻止应用运行。尝试打开应用后，请前往**系统设置 > 隐私与安全性**，向下滚动到“安全性”，然后点按**仍要打开**。详情请参阅 [Apple 关于打开来自身份不明开发者的 Mac App 的说明](https://support.apple.com/zh-cn/guide/mac-help/mh40616/mac)。
 
@@ -43,16 +43,16 @@ brew install xcodegen
 克隆仓库，并将应用构建到 `/Applications`：
 
 ```sh
-git clone https://github.com/HappyOnigiri/TimeTracker.git
-cd TimeTracker
+git clone https://github.com/HappyOnigiri/Xelapse.git
+cd Xelapse
 make install
 ```
 
-`make install` 会替换 `/Applications/TimeTracker.app` 中已有的应用。
+`make install` 会替换 `/Applications/Xelapse.app` 中已有的应用。
 
 ## 参与贡献
 
-请通过 [Issues](https://github.com/HappyOnigiri/TimeTracker/issues) 报告问题或提出功能建议，并通过 Pull Request 提交更改。
+请通过 [Issues](https://github.com/HappyOnigiri/Xelapse/issues) 报告问题或提出功能建议，并通过 Pull Request 提交更改。
 
 创建 Pull Request 前，请安装 SwiftLint 并确认 `make ci` 成功：
 
