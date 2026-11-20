@@ -182,8 +182,9 @@ enum ReportAggregator {
         var cursor = calendar.startOfDay(for: range.lowerBound)
         while cursor < range.upperBound {
             days.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
+            guard let interval = calendar.dateInterval(of: .day, for: cursor),
+                  interval.end > cursor else { break }
+            cursor = interval.end
         }
         return days
     }

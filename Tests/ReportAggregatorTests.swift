@@ -190,6 +190,20 @@ struct ReportAggregatorTests {
         #expect(summaries[0].seconds == 3600)
     }
 
+    @Test("日付別集計は JST の夏時間開始後も日付境界で計測を分割する")
+    func dailyWorkSummariesKeepsMidnightBoundariesAfterClockChange() {
+        let calendar = Calendar.jst
+        let start = calendar.date(from: DateComponents(year: 1948, month: 5, day: 1))!
+        let logStart = calendar.date(from: DateComponents(year: 1948, month: 5, day: 4, hour: 23))!
+        let logEnd = calendar.date(from: DateComponents(year: 1948, month: 5, day: 5, hour: 1))!
+        let log = TimeLog(project: Project(name: "A"), startDate: logStart, endDate: logEnd, notes: ["実装"])
+        let summaries = ReportAggregator.dailyWorkSummaries(logs: [log], in: start...logEnd, calendar: calendar)
+
+        #expect(summaries.map { calendar.component(.day, from: $0.day) } == [1, 2, 3, 4, 5])
+        #expect(summaries.map(\.seconds) == [0, 0, 0, 3600, 3600])
+        #expect(summaries.suffix(2).map(\.notes) == [["実装"], ["実装"]])
+    }
+
     @Test("日付別集計は稼働のない日も 0 秒で含め、期間の全日を網羅する")
     func dailyWorkSummariesIncludesEmptyDays() {
         let project = Project(name: "A")
