@@ -5,9 +5,13 @@ enum DashboardPeriod: Hashable {
     case year
     case allTime
 
-    static var localCalendar: Calendar {
+    var reportCalendar: Calendar {
+        self == .month ? .current : Self.gregorianCalendar(timeZone: .current)
+    }
+
+    static func gregorianCalendar(timeZone: TimeZone) -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .current
+        calendar.timeZone = timeZone
         return calendar
     }
 
@@ -27,12 +31,12 @@ enum DashboardPeriod: Hashable {
         }
     }
 
-    func filenamePeriod(for date: Date, calendar: Calendar) -> String {
+    func filenamePeriod(for date: Date, timeZone: TimeZone) -> String {
         guard self != .allTime else { return "all-time" }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.calendar = calendar
-        formatter.timeZone = calendar.timeZone
+        formatter.calendar = Self.gregorianCalendar(timeZone: timeZone)
+        formatter.timeZone = timeZone
         formatter.dateFormat = self == .month ? "yyyy-MM" : "yyyy"
         return formatter.string(from: date)
     }
@@ -54,8 +58,9 @@ struct DashboardReport {
         period: DashboardPeriod,
         selectedDate: Date,
         now: Date = Date(),
-        calendar: Calendar = DashboardPeriod.localCalendar
+        calendar: Calendar? = nil
     ) {
+        let calendar = calendar ?? period.reportCalendar
         let projectLogs = projectID.map { id in logs.filter { $0.project?.id == id } } ?? logs
         let range: ClosedRange<Date>?
         if let unit = period.navigationUnit {
@@ -127,14 +132,16 @@ struct DashboardReport {
             logs: logsInRange, in: range, unit: period.trendUnit, now: now, calendar: calendar)
     }
 
-    /// 年別・月別はローカル時刻の年・月を JST の暦で取り直す。
+    /// 年別・月別は選択中の暦の年・月を日本時間で取り直す。
     /// 全期間では記録の開始・終了時刻をそのまま JST の日付別集計に使う。
     var dailyWorkRange: ClosedRange<Date>? {
         guard let unit = period.navigationUnit else { return range }
-        let components: Set<Calendar.Component> = period == .month ? [.year, .month] : [.year]
-        let jst = Calendar.jst
-        guard let date = jst.date(from: calendar.dateComponents(components, from: selectedDate)),
-              let interval = jst.dateInterval(of: unit, for: date) else { return nil }
+        let units: Set<Calendar.Component> = period == .month ? [.era, .year, .month] : [.era, .year]
+        var exportCalendar = calendar
+        exportCalendar.timeZone = Calendar.jst.timeZone
+        let components = calendar.dateComponents(units, from: selectedDate)
+        guard let date = exportCalendar.date(from: components),
+              let interval = exportCalendar.dateInterval(of: unit, for: date) else { return nil }
         return interval.start...interval.end
     }
 
@@ -155,6 +162,7 @@ struct DashboardReport {
 
     func exportFilename(_ key: String.LocalizationValue, locale: Locale) -> String {
         let format = L10n.string(key, locale: locale)
-        return String(format: format, locale: locale, period.filenamePeriod(for: selectedDate, calendar: calendar))
+        let label = period.filenamePeriod(for: selectedDate, timeZone: calendar.timeZone)
+        return String(format: format, locale: locale, label)
     }
 }

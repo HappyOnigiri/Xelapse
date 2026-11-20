@@ -120,7 +120,7 @@ struct DashboardView: View {
     private func periodLabel(for date: Date, calendar: Calendar, isMonth: Bool) -> String {
         let formatter = DateFormatter()
         formatter.locale = locale
-        formatter.calendar = calendar
+        formatter.calendar = DashboardPeriod.gregorianCalendar(timeZone: calendar.timeZone)
         formatter.timeZone = calendar.timeZone
         formatter.setLocalizedDateFormatFromTemplate(isMonth ? "yMMMM" : "y")
         return formatter.string(from: date)
@@ -211,7 +211,7 @@ struct DashboardView: View {
 
     private static var currentMonthStart: Date {
         let now = Date()
-        return DashboardPeriod.localCalendar.dateInterval(of: .month, for: now)?.start ?? now
+        return DashboardPeriod.month.reportCalendar.dateInterval(of: .month, for: now)?.start ?? now
     }
 
     private var report: DashboardReport {

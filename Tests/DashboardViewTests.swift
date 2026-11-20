@@ -31,6 +31,29 @@ struct DashboardViewTests {
         #expect(summaries.last?.seconds == 3600)
     }
 
+    @Test("月別は選択中の暦の月境界を使い、CSV のファイル名はグレゴリオ暦で表示する")
+    func monthlyReportUsesNonGregorianBoundaries() {
+        var calendar = Calendar(identifier: .islamicCivil)
+        calendar.timeZone = TestSupport.utcCalendar.timeZone
+        let date = TestSupport.date(2025, 7, 1, 12)
+        let month = calendar.dateInterval(of: .month, for: date)!
+        let log = TimeLog(
+            project: Project(name: "A"), startDate: month.start.addingTimeInterval(-3600),
+            endDate: month.start.addingTimeInterval(3600))
+        let report = DashboardReport(logs: [log], period: .month, selectedDate: month.start, calendar: calendar)
+
+        #expect(report.range == month.start...month.end)
+        #expect(report.projectTotals.map(\.seconds) == [3600])
+        #expect(report.trendDurations.map(\.start) == [month.start])
+        let csv = CSVExporter.makeCSV(logs: report.logsInRange, clipTo: report.range, locale: Locale(identifier: "en"))
+        #expect(csv.contains(",3600,"))
+        #expect(report.exportFilename("filename.timelogs", locale: Locale(identifier: "en")) == "timelogs-2025-06.csv")
+
+        calendar.timeZone = Calendar.jst.timeZone
+        let jstMonth = calendar.dateInterval(of: .month, for: date)!
+        #expect(report.dailyWorkRange == jstMonth.start...jstMonth.end)
+    }
+
     @Test("年別はプロジェクトで絞り、選択年の稼働を月の境界で分割する")
     func yearlyReportGroupsByMonthWithinSelectedProject() {
         let selectedProject = Project(name: "A")
