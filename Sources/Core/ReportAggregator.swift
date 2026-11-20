@@ -9,14 +9,14 @@ struct ProjectTotal: Identifiable {
     var id: UUID { projectID }
 }
 
-/// 1 日 × プロジェクトごとの稼働時間。
-struct DailyDuration: Identifiable {
-    let day: Date
+/// 日・月・年の区間 × プロジェクトごとの稼働時間。
+struct PeriodDuration: Identifiable {
+    let start: Date
     let projectID: UUID
     let name: String
     let colorHex: String
     let seconds: TimeInterval
-    var id: String { "\(projectID.uuidString)-\(day.timeIntervalSince1970)" }
+    var id: String { "\(projectID.uuidString)-\(start.timeIntervalSince1970)" }
 }
 
 /// 1 日の稼働時間と、その日に稼働のあった作業内容。
@@ -37,14 +37,14 @@ struct NoteTotal: Identifiable {
     var id: String { note ?? "__uncategorized__" }
 }
 
-/// TimeLog 群を期間で切り出し、合計/日次に集計する純粋ロジック。
+/// TimeLog 群を期間で切り出し、合計や推移を集計する純粋ロジック。
 enum ReportAggregator {
     /// 集計途中の値を保持する内部アキュムレータ。
     private struct Accumulator {
         let projectID: UUID
         let name: String
         let colorHex: String
-        var day: Date = .distantPast
+        var start: Date = .distantPast
         var seconds: TimeInterval = 0
     }
 
@@ -70,23 +70,24 @@ enum ReportAggregator {
             .sorted { $0.seconds > $1.seconds }
     }
 
-    /// 1 日ごと × プロジェクトの稼働秒数を、日付昇順で返す。
-    static func dailyDurations(
+    /// 区間 × プロジェクトの稼働秒数を、区間の開始時刻順で返す。
+    static func periodDurations(
         logs: [TimeLog],
         in range: ClosedRange<Date>,
+        unit: Calendar.Component,
         now: Date = Date(),
         calendar: Calendar = .current
-    ) -> [DailyDuration] {
+    ) -> [PeriodDuration] {
         var grouped: [String: Accumulator] = [:]
         for log in logs {
             guard let project = log.project else { continue }
-            for segment in dailySegments(for: log, in: range, now: now, calendar: calendar) {
-                let key = "\(project.id.uuidString)-\(segment.day.timeIntervalSince1970)"
+            for segment in segments(for: log, in: range, unit: unit, now: now, calendar: calendar) {
+                let key = "\(project.id.uuidString)-\(segment.start.timeIntervalSince1970)"
                 var entry = grouped[key] ?? Accumulator(
                     projectID: project.id,
                     name: project.name,
                     colorHex: project.colorHex,
-                    day: segment.day
+                    start: segment.start
                 )
                 entry.seconds += segment.seconds
                 grouped[key] = entry
@@ -94,10 +95,10 @@ enum ReportAggregator {
         }
         return grouped.values
             .map {
-                DailyDuration(day: $0.day, projectID: $0.projectID,
-                              name: $0.name, colorHex: $0.colorHex, seconds: $0.seconds)
+                PeriodDuration(start: $0.start, projectID: $0.projectID,
+                               name: $0.name, colorHex: $0.colorHex, seconds: $0.seconds)
             }
-            .sorted { $0.day < $1.day }
+            .sorted { $0.start < $1.start }
     }
 
     /// 作業内容（note）ごとの合計稼働秒数を、稼働時間の降順で返す。
@@ -150,19 +151,19 @@ enum ReportAggregator {
         var seenNotes: [Date: Set<String>] = [:]
 
         for log in logs.sorted(by: { $0.startDate < $1.startDate }) {
-            let segments = dailySegments(for: log, in: range, now: now, calendar: calendar)
-            guard !segments.isEmpty else { continue }
+            let dailySegments = segments(for: log, in: range, unit: .day, now: now, calendar: calendar)
+            guard !dailySegments.isEmpty else { continue }
             let logNotes = log.notes
                 .map { $0.trimmingCharacters(in: .whitespaces) }
                 .filter { !$0.isEmpty }
 
-            for segment in segments {
-                seconds[segment.day, default: 0] += segment.seconds
-                var seen = seenNotes[segment.day] ?? []
+            for segment in dailySegments {
+                seconds[segment.start, default: 0] += segment.seconds
+                var seen = seenNotes[segment.start] ?? []
                 for note in logNotes where seen.insert(note).inserted {
-                    notes[segment.day, default: []].append(note)
+                    notes[segment.start, default: []].append(note)
                 }
-                seenNotes[segment.day] = seen
+                seenNotes[segment.start] = seen
             }
         }
 
@@ -181,8 +182,9 @@ enum ReportAggregator {
         var cursor = calendar.startOfDay(for: range.lowerBound)
         while cursor < range.upperBound {
             days.append(cursor)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
-            cursor = next
+            guard let interval = calendar.dateInterval(of: .day, for: cursor),
+                  interval.end > cursor else { break }
+            cursor = interval.end
         }
         return days
     }
@@ -194,13 +196,14 @@ enum ReportAggregator {
         return max(0, end.timeIntervalSince(start))
     }
 
-    /// 期間でクリップしつつ、日付境界で分割した (日, 秒数) を返す。
-    private static func dailySegments(
+    /// 期間でクリップしつつ、区間の境界で分割した (開始時刻, 秒数) を返す。
+    private static func segments(
         for log: TimeLog,
         in range: ClosedRange<Date>,
+        unit: Calendar.Component,
         now: Date,
         calendar: Calendar
-    ) -> [(day: Date, seconds: TimeInterval)] {
+    ) -> [(start: Date, seconds: TimeInterval)] {
         let start = max(log.startDate, range.lowerBound)
         let end = min(log.endDate ?? now, range.upperBound)
         guard end > start else { return [] }
@@ -208,10 +211,9 @@ enum ReportAggregator {
         var segments: [(Date, TimeInterval)] = []
         var cursor = start
         while cursor < end {
-            let dayStart = calendar.startOfDay(for: cursor)
-            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: dayStart) else { break }
-            let segmentEnd = min(nextDay, end)
-            segments.append((dayStart, segmentEnd.timeIntervalSince(cursor)))
+            guard let interval = calendar.dateInterval(of: unit, for: cursor), interval.end > cursor else { break }
+            let segmentEnd = min(interval.end, end)
+            segments.append((interval.start, segmentEnd.timeIntervalSince(cursor)))
             cursor = segmentEnd
         }
         return segments
