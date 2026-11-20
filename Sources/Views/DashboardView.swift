@@ -54,8 +54,10 @@ struct DashboardView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
-                .onChange(of: period) { _, newPeriod in
-                    if newPeriod == .year { selectedYear = selectedMonth }
+                .onChange(of: period) { oldPeriod, newPeriod in
+                    if oldPeriod == .month && newPeriod == .year {
+                        selectedYear = selectedMonth
+                    }
                 }
                 Spacer()
                 projectFilterMenu
