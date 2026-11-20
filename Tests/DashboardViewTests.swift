@@ -103,6 +103,26 @@ struct DashboardViewTests {
         #expect(report.dailyWorkSummaries.isEmpty)
     }
 
+    @Test("稼働時間がゼロの記録は全期間の推移や日付別 CSV の範囲を広げない")
+    func allTimeReportIgnoresZeroDurationBounds() {
+        let project = Project(name: "A")
+        let start = TestSupport.date(2025, 6, 1, 9)
+        let end = start.addingTimeInterval(3600)
+        let zeroDates = [TestSupport.date(2023, 1, 1, 9), TestSupport.date(2027, 1, 1, 9)]
+        let zeroLogs = zeroDates.map { TimeLog(project: project, startDate: $0, endDate: $0) }
+        let work = TimeLog(project: project, startDate: start, endDate: end)
+        let report = DashboardReport(
+            logs: zeroLogs + [work], period: .allTime, selectedDate: start, calendar: TestSupport.utcCalendar)
+
+        #expect(report.range == start...end)
+        #expect(report.logsInRange.map(\.id) == [work.id])
+        #expect(report.dailyWorkSummaries.map(\.seconds) == [3600])
+
+        let emptyReport = DashboardReport(logs: zeroLogs, period: .allTime, selectedDate: start)
+        #expect(emptyReport.range == nil)
+        #expect(emptyReport.dailyWorkSummaries.isEmpty)
+    }
+
     @Test("海外の選択年でも日付別 CSV は JST の年初から翌年初まで出力する")
     func dailyWorkRangeUsesJSTYearBoundariesOutsideJapan() {
         var losAngeles = Calendar(identifier: .gregorian)

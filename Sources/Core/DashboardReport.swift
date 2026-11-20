@@ -60,11 +60,8 @@ struct DashboardReport {
         let range: ClosedRange<Date>?
         if let unit = period.navigationUnit {
             range = calendar.dateInterval(of: unit, for: selectedDate).map { $0.start...$0.end }
-        } else if let start = projectLogs.map(\.startDate).min(),
-                  let end = projectLogs.map({ $0.endDate ?? now }).max(), end >= start {
-            range = start...end
         } else {
-            range = nil
+            range = Self.allTimeRange(logs: projectLogs, now: now)
         }
 
         self.period = period
@@ -78,6 +75,21 @@ struct DashboardReport {
                 min($0.endDate ?? now, range.upperBound) > max($0.startDate, range.lowerBound)
             }
         } ?? []
+    }
+
+    private static func allTimeRange(logs: [TimeLog], now: Date) -> ClosedRange<Date>? {
+        var range: ClosedRange<Date>?
+        for log in logs {
+            let start = log.startDate
+            let end = log.endDate ?? now
+            guard start < end else { continue }
+            if let previous = range {
+                range = min(previous.lowerBound, start)...max(previous.upperBound, end)
+            } else {
+                range = start...end
+            }
+        }
+        return range
     }
 
     var projectTotals: [ProjectTotal] {
