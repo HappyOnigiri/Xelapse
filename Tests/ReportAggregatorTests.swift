@@ -32,9 +32,10 @@ struct ReportAggregatorTests {
 
     @Test("日次集計は日付境界で分割する")
     func dailyDurationsSplitsAtMidnight() {
-        let daily = ReportAggregator.dailyDurations(logs: makeLogs(), in: range, calendar: TestSupport.utcCalendar)
+        let daily = ReportAggregator.periodDurations(
+            logs: makeLogs(), in: range, unit: .day, calendar: TestSupport.utcCalendar)
         let byDay = Dictionary(uniqueKeysWithValues: daily.map {
-            (TestSupport.utcCalendar.startOfDay(for: $0.day), $0.seconds)
+            ($0.start, $0.seconds)
         })
         #expect(byDay[TestSupport.date(2025, 1, 10)] == 5400) // 1.5h
         #expect(byDay[TestSupport.date(2025, 1, 11)] == 1800) // 30m
