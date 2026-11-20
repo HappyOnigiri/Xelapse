@@ -92,6 +92,25 @@ struct DashboardReport {
         return range
     }
 
+    /// 画面または日付別 CSV に稼働がある年まで移動できるようにする。
+    var latestYearStart: Date {
+        let current = calendar.dateInterval(of: .year, for: now)?.start ?? now
+        guard let end = Self.allTimeRange(logs: projectLogs, now: now)?.upperBound else { return current }
+        let localStart = Self.yearStart(before: end, calendar: calendar)
+        let jst = Calendar.jst
+        let jstStart = Self.yearStart(before: end, calendar: jst)
+        let jstYearInLocalTime = jstStart.flatMap { calendar.date(from: jst.dateComponents([.era, .year], from: $0)) }
+        return max(current, localStart ?? current, jstYearInLocalTime ?? current)
+    }
+
+    private static func yearStart(before end: Date, calendar: Calendar) -> Date? {
+        guard let interval = calendar.dateInterval(of: .year, for: end) else { return nil }
+        if end == interval.start {
+            return calendar.dateInterval(of: .year, for: end.addingTimeInterval(-1))?.start
+        }
+        return interval.start
+    }
+
     var projectTotals: [ProjectTotal] {
         guard let range else { return [] }
         return ReportAggregator.projectTotals(logs: logsInRange, in: range, now: now)

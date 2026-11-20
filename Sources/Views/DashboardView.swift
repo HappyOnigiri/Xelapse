@@ -24,7 +24,7 @@ struct DashboardView: View {
         let report = report
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                controls
+                controls(report)
                 if let range = report.range, !report.logsInRange.isEmpty {
                     totalsSection(report.projectTotals)
                     trendSection(report, range: range)
@@ -43,7 +43,7 @@ struct DashboardView: View {
 
     // MARK: - 操作部
 
-    private var controls: some View {
+    private func controls(_ report: DashboardReport) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Picker("集計期間", selection: $period) {
@@ -68,7 +68,7 @@ struct DashboardView: View {
                 }
             }
             if let unit = period.navigationUnit {
-                periodNavigation(unit: unit)
+                periodNavigation(unit: unit, report: report)
             }
             if let exportMessage {
                 Text(exportMessage)
@@ -79,14 +79,15 @@ struct DashboardView: View {
         }
     }
 
-    private func periodNavigation(unit: Calendar.Component) -> some View {
+    private func periodNavigation(unit: Calendar.Component, report: DashboardReport) -> some View {
         let isMonth = unit == .month
         let selection = isMonth ? $selectedMonth : $selectedYear
-        let calendar = DashboardPeriod.localCalendar
+        let calendar = report.calendar
         let date = selection.wrappedValue
         let now = Date()
         let start = calendar.dateInterval(of: unit, for: date)?.start ?? date
         let current = calendar.dateInterval(of: unit, for: now)?.start ?? now
+        let latest = isMonth ? current : report.latestYearStart
         let previousLabel: LocalizedStringKey = isMonth ? "前の月" : "前の年"
         let nextLabel: LocalizedStringKey = isMonth ? "次の月" : "次の年"
         let currentLabel: LocalizedStringKey = isMonth ? "今月" : "今年"
@@ -104,13 +105,13 @@ struct DashboardView: View {
                 .monospacedDigit()
                 .frame(minWidth: 110)
             Button {
-                selection.wrappedValue = min(calendar.date(byAdding: unit, value: 1, to: start) ?? start, current)
+                selection.wrappedValue = min(calendar.date(byAdding: unit, value: 1, to: start) ?? start, latest)
             } label: {
                 Image(systemName: "chevron.right")
             }
             .help(nextLabel)
             .accessibilityLabel(nextLabel)
-            .disabled(start >= current)
+            .disabled(start >= latest)
             Button(currentLabel) { selection.wrappedValue = current }
                 .disabled(start == current)
         }

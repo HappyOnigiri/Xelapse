@@ -60,6 +60,30 @@ struct DashboardViewTests {
         #expect(report.noteTotals.map(\.seconds) == [9000, 5400])
     }
 
+    @Test("年別はローカル暦か JST で稼働のある最後の年まで選べる", arguments: [
+        ("America/Los_Angeles", 15), ("Pacific/Auckland", 11)
+    ])
+    func latestSelectableYearIncludesWorkAfterEitherYearBoundary(timeZone: String, boundaryHour: Int) {
+        var calendar = TestSupport.utcCalendar
+        calendar.timeZone = TimeZone(identifier: timeZone)!
+        let current = TestSupport.date(2025, 6, 1)
+        let boundary = TestSupport.date(2025, 12, 31, boundaryHour)
+        let project = Project(name: "A")
+        let work = TimeLog(project: project, startDate: boundary.addingTimeInterval(-3600), endDate: boundary)
+        let other = TimeLog(project: Project(name: "B"), startDate: current, endDate: TestSupport.date(2027, 1, 1))
+
+        let atBoundary = DashboardReport(
+            logs: [work, other], projectID: project.id, period: .year,
+            selectedDate: current, now: current, calendar: calendar)
+        #expect(atBoundary.latestYearStart == calendar.date(from: DateComponents(year: 2025)))
+
+        work.endDate = boundary.addingTimeInterval(1)
+        let afterBoundary = DashboardReport(
+            logs: [work, other], projectID: project.id, period: .year,
+            selectedDate: current, now: current, calendar: calendar)
+        #expect(afterBoundary.latestYearStart == calendar.date(from: DateComponents(year: 2026)))
+    }
+
     @Test("全期間は対象ログの開始から計測中の時刻までを年ごとに集計し、同じ作業内容を合算する")
     func allTimeReportSplitsYearsAndSumsNotes() {
         let project = Project(name: "A")
